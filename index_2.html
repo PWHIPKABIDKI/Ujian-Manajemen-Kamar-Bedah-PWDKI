@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ujian Tulis Pelatihan Manajemen Kamar Bedah | HIPKABI DKI Jakarta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root{
+    --ink:#0E2A2D;
+    --ink-soft:#3E5A5C;
+    --scrub:#0F766E;
+    --scrub-deep:#0A4F4A;
+    --sterile:#F2F7F6;
+    --card:#FFFFFF;
+    --line:#D8E5E2;
+    --amber:#B45309;
+    --amber-bg:#FEF3C7;
+    --red:#B91C1C;
+    --red-bg:#FEE2E2;
+    --green:#15803D;
+    --green-bg:#DCFCE7;
+    --radius:14px;
+    --shadow:0 6px 20px rgba(14,42,45,.08);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    font-family:'IBM Plex Sans',system-ui,sans-serif;
+    background:
+      radial-gradient(1100px 500px at 85% -10%, rgba(15,118,110,.10), transparent 60%),
+      var(--sterile);
+    color:var(--ink);
+    min-height:100vh;
+    line-height:1.55;
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:22px 16px 60px}
+  .screen{display:none}
+  .screen.active{display:block;animation:fadein .25s ease}
+  @keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  /* ---------- shared ---------- */
+  h1,h2{font-family:'Sora',sans-serif;letter-spacing:-.02em}
+  .brand{
+    display:flex;align-items:center;gap:10px;
+    font-family:'Sora',sans-serif;font-weight:700;font-size:.82rem;
+    color:var(--scrub-deep);text-transform:uppercase;letter-spacing:.14em;
+    margin-bottom:26px;
+  }
+  .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--scrub);box-shadow:0 0 0 4px rgba(15,118,110,.15)}
+  .card{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:26px 22px;
+  }
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    font-family:'Sora',sans-serif;font-weight:600;font-size:1rem;
+    border:none;border-radius:12px;cursor:pointer;
+    padding:14px 22px;transition:transform .08s ease, box-shadow .15s ease, background .15s ease;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .btn:focus-visible{outline:3px solid rgba(15,118,110,.45);outline-offset:2px}
+  .btn:active{transform:scale(.98)}
+  .btn-primary{background:var(--scrub);color:#fff}
+  .btn-primary:hover{background:var(--scrub-deep)}
+  .btn-ghost{background:transparent;color:var(--scrub-deep);border:1.5px solid var(--line)}
+  .btn-ghost:hover{border-color:var(--scrub)}
+  .btn-danger{background:var(--ink);color:#fff}
+  .btn[disabled]{opacity:.45;cursor:not-allowed;transform:none}
+  .btn-block{width:100%}
+  .stack{display:flex;flex-direction:column;gap:12px}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  .muted{color:var(--ink-soft);font-size:.92rem}
+  .notice{
+    background:var(--amber-bg);color:var(--amber);border-radius:10px;
+    padding:11px 14px;font-size:.88rem;font-weight:500;
+  }
+
+  /* ---------- home ---------- */
+  #home .hero{
+    background:linear-gradient(150deg,var(--scrub-deep) 0%, var(--scrub) 70%, #14958B 100%);
+    color:#fff;border-radius:18px;padding:34px 24px 30px;
+    box-shadow:0 14px 34px rgba(10,79,74,.30);
+    position:relative;overflow:hidden;
+  }
+  #home .hero::after{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:
+      linear-gradient(transparent 96%, rgba(255,255,255,.10) 96%) 0 0/100% 34px,
+      linear-gradient(90deg, transparent 96%, rgba(255,255,255,.07) 96%) 0 0/34px 100%;
+  }
+  #home .eyebrow{
+    display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:.74rem;font-weight:600;
+    letter-spacing:.16em;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);
+    border-radius:999px;padding:5px 13px;margin-bottom:16px;
+  }
+  #home h1{font-size:clamp(1.5rem,5.2vw,2.05rem);line-height:1.2;font-weight:800;margin-bottom:10px}
+  #home .hero p{color:rgba(255,255,255,.88);max-width:48ch}
+  .chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:22px 0}
+  .chip{
+    background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;font-size:.88rem;font-weight:500;display:flex;gap:9px;align-items:center;
+  }
+  .chip b{font-family:'Sora',sans-serif;color:var(--scrub-deep)}
+  footer{margin-top:34px;text-align:center;font-size:.8rem;color:var(--ink-soft)}
+
+  /* ---------- form ---------- */
+  label{font-weight:600;font-size:.92rem;display:block;margin-bottom:6px}
+  input[type=text],input[type=password]{
+    width:100%;font:inherit;padding:13px 14px;border-radius:12px;
+    border:1.5px solid var(--line);background:#fff;color:var(--ink);
+  }
+  input:focus{outline:none;border-color:var(--scrub);box-shadow:0 0 0 4px rgba(15,118,110,.14)}
+  .err{color:var(--red);font-size:.82rem;margin-top:5px;display:none}
+  .field.invalid .err{display:block}
+  .field.invalid input{border-color:var(--red)}
+
+  /* ---------- exam ---------- */
+  .monitor{
+    position:sticky;top:10px;z-index:5;
+    background:var(--ink);color:#E7F5F3;border-radius:14px;
+    padding:12px 16px;box-shadow:0 10px 24px rgba(14,42,45,.28);
+    display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+    margin-bottom:14px;
+  }
+  .monitor .who{font-size:.8rem;color:#9FC4C0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:48%}
+  .monitor .who b{color:#fff}
+  .vitals{display:flex;align-items:center;gap:14px}
+  .vital{font-family:'IBM Plex Mono',monospace;font-weight:600}
+  .vital .lbl{display:block;font-size:.6rem;letter-spacing:.14em;color:#9FC4C0}
+  .vital .val{font-size:1.15rem;color:#7CE3D8}
+  .vital.warn .val{color:#FBBF24;animation:blink 1s steps(2,start) infinite}
+  @keyframes blink{50%{opacity:.35}}
+  @media (prefers-reduced-motion: reduce){
+    .vital.warn .val{animation:none}
+    .screen.active{animation:none}
+  }
+  .progressbar{height:6px;background:var(--line);border-radius:99px;overflow:hidden;margin:0 0 18px}
+  .progressbar>div{height:100%;background:linear-gradient(90deg,var(--scrub),#14958B);width:0%;transition:width .25s ease}
+  .q-num{
+    font-family:'IBM Plex Mono',monospace;font-size:.78rem;font-weight:600;
+    color:var(--scrub-deep);letter-spacing:.12em;margin-bottom:8px;
+  }
+  .q-text{font-size:1.05rem;font-weight:600;margin-bottom:18px}
+  .opt{
+    display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;
+    background:#fff;border:1.5px solid var(--line);border-radius:12px;
+    padding:13px 14px;cursor:pointer;font:inherit;color:var(--ink);
+    transition:border-color .12s ease, background .12s ease;
+  }
+  .opt:hover{border-color:var(--scrub)}
+  .opt:focus-visible{outline:3px solid rgba(15,118,110,.4);outline-offset:2px}
+  .opt .letter{
+    flex:none;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;
+    font-family:'Sora',sans-serif;font-weight:700;font-size:.85rem;
+    background:var(--sterile);color:var(--scrub-deep);border:1px solid var(--line);
+  }
+  .opt.selected{border-color:var(--scrub);background:#EBF6F4;box-shadow:0 0 0 3px rgba(15,118,110,.12)}
+  .opt.selected .letter{background:var(--scrub);color:#fff;border-color:var(--scrub)}
+  .exam-nav{display:flex;gap:10px;margin-top:18px}
+  .exam-nav .btn{flex:1}
+  #btn-finish{margin-top:12px}
+  .dots{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px}
+  .dot-q{
+    width:30px;height:30px;border-radius:8px;border:1.5px solid var(--line);background:#fff;
+    font-family:'IBM Plex Mono',monospace;font-size:.72rem;font-weight:600;color:var(--ink-soft);
+    cursor:pointer;
+  }
+  .dot-q.answered{background:var(--scrub);border-color:var(--scrub);color:#fff}
+  .dot-q.current{outline:2.5px solid var(--ink);outline-offset:1px}
+
+  /* ---------- result & locked ---------- */
+  .scorebox{text-align:center;padding:30px 20px}
+  .scorebox .lbl{font-family:'IBM Plex Mono',monospace;font-size:.74rem;letter-spacing:.18em;color:var(--ink-soft)}
+  .scorebox .num{font-family:'Sora',sans-serif;font-weight:800;font-size:4.2rem;line-height:1;color:var(--scrub-deep);margin:8px 0 2px}
+  .scorebox .of{color:var(--ink-soft);font-size:.95rem}
+  .statgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px}
+  .stat{border-radius:12px;padding:12px 8px;text-align:center;font-weight:600;font-size:.86rem}
+  .stat b{display:block;font-family:'Sora',sans-serif;font-size:1.4rem}
+  .stat.ok{background:var(--green-bg);color:var(--green)}
+  .stat.bad{background:var(--red-bg);color:var(--red)}
+  .stat.skip{background:var(--amber-bg);color:var(--amber)}
+  .review-title{font-size:1.15rem;margin:30px 0 14px}
+  .rev{border-left:5px solid var(--line);margin-bottom:12px}
+  .rev.ok{border-left-color:var(--green)}
+  .rev.bad{border-left-color:var(--red)}
+  .rev.skip{border-left-color:var(--amber)}
+  .rev .q-text{font-size:.98rem;margin-bottom:12px}
+  .ansline{font-size:.9rem;margin-bottom:4px}
+  .ansline b{font-family:'Sora',sans-serif}
+  .tag{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.06em;border-radius:6px;padding:2px 8px;margin-bottom:10px}
+  .rev.ok .tag{background:var(--green-bg);color:var(--green)}
+  .rev.bad .tag{background:var(--red-bg);color:var(--red)}
+  .rev.skip .tag{background:var(--amber-bg);color:var(--amber)}
+  .pemb{
+    margin-top:10px;background:var(--sterile);border-radius:10px;
+    padding:11px 13px;font-size:.89rem;color:var(--ink-soft);
+  }
+  .pemb b{color:var(--scrub-deep)}
+  .lockicon{font-size:2.6rem;margin-bottom:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ BERANDA ============ -->
+  <section id="home" class="screen active">
+    <div class="brand"><span class="dot"></span> HIPKABI DKI Jakarta</div>
+    <div class="hero">
+      <span class="eyebrow">EVALUASI PESERTA &bull; 2026</span>
+      <h1>Ujian Tulis Pelatihan<br>Manajemen Kamar Bedah</h1>
+      <p>30 soal pilihan ganda seputar manajemen pelayanan keperawatan kamar bedah: regulasi, jenjang karir, pembiayaan, ketenagaan, supervisi, PPI, hingga Surgical Safety Checklist.</p>
+    </div>
+    <div class="chips">
+      <div class="chip">&#128203; <span><b>30</b> soal pilihan ganda</span></div>
+      <div class="chip">&#9201;&#65039; <span>Total waktu <b>30 menit</b></span></div>
+      <div class="chip">&#128276; <span><b>Alarm</b> saat sisa 5 menit</span></div>
+      <div class="chip">&#9989; <span>Kesempatan <b>1 kali</b> ujian</span></div>
+    </div>
+    <div class="notice" style="margin-bottom:14px">&#9888;&#65039; Jawaban terkirim <b>otomatis</b> saat waktu 30 menit habis, dan ujian hanya dapat dikerjakan <b>satu kali</b>. Pastikan Anda siap sebelum memulai.</div>
+    <button class="btn btn-primary btn-block" onclick="tryStart()">&#128640; Mulai Ujian</button>
+    <footer>Versi 2.0 &bull; Bidang Diklat HIPKABI DKI Jakarta</footer>
+  </section>
+
+  <!-- ============ DATA PESERTA ============ -->
+  <section id="data" class="screen">
+    <div class="brand"><span class="dot"></span> HIPKABI DKI Jakarta</div>
+    <div class="card">
+      <h2 style="margin-bottom:6px">&#128100; Data Peserta</h2>
+      <p class="muted" style="margin-bottom:20px">Isi data diri Anda sebelum memulai ujian.</p>
+      <div class="stack">
+        <div class="field" id="f-nama">
+          <label for="in-nama">Nama Lengkap</label>
+          <input type="text" id="in-nama" autocomplete="name" placeholder="cth: Ns. Budi Santoso, S.Kep">
+          <div class="err">Nama tidak boleh kosong.</div>
+        </div>
+        <div class="field" id="f-instansi">
+          <label for="in-instansi">Asal Instansi</label>
+          <input type="text" id="in-instansi" autocomplete="organization" placeholder="cth: RSUD Tarakan Jakarta">
+          <div class="err">Asal instansi tidak boleh kosong.</div>
+        </div>
+        <div class="notice">&#9201;&#65039; Waktu ujian <b>30 menit</b> dimulai saat Anda menekan tombol di bawah. Ujian hanya dapat dikerjakan <b>satu kali</b> dan jawaban terkirim otomatis saat waktu habis.</div>
+        <button class="btn btn-primary btn-block" onclick="startExam()">&#9989; Mulai Mengerjakan (30:00)</button>
+        <button class="btn btn-ghost btn-block" onclick="goTo('home')">&#11013;&#65039; Kembali ke Beranda</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ UJIAN ============ -->
+  <section id="exam" class="screen">
+    <div class="monitor">
+      <div class="who" id="m-who"></div>
+      <div class="vitals">
+        <div class="vital"><span class="lbl">SOAL</span><span class="val" id="m-q">01/30</span></div>
+        <div class="vital" id="v-timer"><span class="lbl">SISA WAKTU</span><span class="val" id="m-timer">30:00</span></div>
+      </div>
+    </div>
+    <div class="progressbar"><div id="pbar"></div></div>
+    <div class="card">
+      <div class="q-num" id="q-num"></div>
+      <div class="q-text" id="q-text"></div>
+      <div class="stack" id="opts"></div>
+      <div class="exam-nav">
+        <button class="btn btn-ghost" id="btn-prev" onclick="nav(-1)">&#11013;&#65039; Sebelumnya</button>
+        <button class="btn btn-primary" id="btn-next" onclick="nav(1)">Selanjutnya &#10145;&#65039;</button>
+      </div>
+      <button class="btn btn-danger btn-block" id="btn-finish" onclick="confirmFinish()">&#127937; Selesai &amp; Kirim Jawaban</button>
+      <div class="dots" id="dots"></div>
+    </div>
+  </section>
+
+  <!-- ============ HASIL ============ -->
+  <section id="result" class="screen">
+    <div class="brand"><span class="dot"></span> HIPKABI DKI Jakarta</div>
+    <div class="card scorebox">
+      <div class="lbl">SKOR ANDA</div>
+      <div class="num" id="r-score">0</div>
+      <div class="of">dari 100</div>
+      <div class="muted" id="r-who" style="margin-top:8px"></div>
+      <div class="statgrid">
+        <div class="stat ok"><b id="r-benar">0</b> Benar</div>
+        <div class="stat bad"><b id="r-salah">0</b> Salah</div>
+        <div class="stat skip"><b id="r-kosong">0</b> Kosong</div>
+      </div>
+      <div class="stack" style="margin-top:20px">
+        <div class="notice" id="send-status" style="display:none"></div>
+        <button class="btn btn-primary btn-block" onclick="savePDF()">&#128196; Simpan Hasil (PDF)</button>
+        <div class="notice">&#128274; Jawaban Anda sudah terkirim. Ujian hanya dapat dikerjakan satu kali dan tidak dapat diulang tanpa izin panitia.</div>
+      </div>
+    </div>
+    <h2 class="review-title">&#128221; Review Jawaban &amp; Pembahasan</h2>
+    <div id="review"></div>
+  </section>
+
+  <!-- ============ TERKUNCI ============ -->
+  <section id="locked" class="screen">
+    <div class="brand"><span class="dot"></span> HIPKABI DKI Jakarta</div>
+    <div class="card scorebox">
+      <div class="lockicon">&#128274;</div>
+      <h2 style="margin-bottom:8px">Ujian Sudah Diselesaikan</h2>
+      <p class="muted" id="lock-info" style="margin-bottom:18px"></p>
+      <div class="stack" style="text-align:left">
+        <div class="notice">Ujian hanya dapat dikerjakan <b>satu kali</b> di perangkat ini. Untuk mengulang, hubungi panitia/instruktur dan minta <b>kode izin</b>.</div>
+        <div class="field" id="f-kode">
+          <label for="in-kode">Kode Izin dari Panitia</label>
+          <input type="password" id="in-kode" placeholder="Masukkan kode izin">
+          <div class="err" id="kode-err">Kode izin salah.</div>
+        </div>
+        <button class="btn btn-primary btn-block" onclick="unlock()">&#128275; Buka Kunci &amp; Izinkan Ujian Ulang</button>
+        <button class="btn btn-ghost btn-block" onclick="goTo('home')">&#127968; Kembali ke Beranda</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* =========================================================
+   PENGATURAN PANITIA
+   - Ganti ADMIN_CODE dengan kode rahasia Anda sendiri
+     sebelum meng-upload file ini ke GitHub.
+   - Kode ini dipakai untuk membuka kunci ujian ulang.
+   ========================================================= */
+const ADMIN_CODE    = "HIPKABI-DKI-2026";
+
+/* URL Web App Google Apps Script (penerima data ke Spreadsheet Anda).
+   Ikuti petunjuk di file google-apps-script.gs, lalu tempel URL-nya
+   di antara tanda kutip di bawah ini. Contoh:
+   "https://script.google.com/macros/s/AKfycb.../exec"
+   Jika dibiarkan kosong, hasil hanya tampil di layar & PDF. */
+const SHEET_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbyCQOPRNmTaIe6Oe-tbGHJHQKoMZ_5MJb1NT6z_hfWBAa1vwblkfKBi9Ty6S4QrMrAckA/exec";
+
+const TOTAL_SECONDS = 30 * 60;   // total waktu ujian: 30 menit
+const ALARM_AT      = 5 * 60;    // alarm saat sisa waktu 5 menit
+const LOCK_KEY      = "ukmb_hipkabi_lock_v1";
+
+/* ================= DATA SOAL ================= */
+const LETTERS = ["A","B","C","D"];
+const QUESTIONS = [
+ {q:"Sejak akhir 2023, tepatnya bulan Agustus 2023, ada 11 undang-undang tentang kesehatan yang dilebur menjadi satu undang-undang, yaitu:",
+  o:["UU No. 36 Tahun 2023","UU No. 38 Tahun 2023","UU No. 17 Tahun 2023","UU No. 19 Tahun 2023"],k:2,
+  p:"UU No. 17 Tahun 2023 tentang Kesehatan (omnibus law) disahkan pada Agustus 2023 dan melebur 11 undang-undang bidang kesehatan, termasuk UU Keperawatan No. 38 Tahun 2014 dan UU Tenaga Kesehatan."},
+ {q:"Ada 5 kode etik keperawatan di Indonesia, di antaranya:",
+  o:["Perawat dan Dokter","Perawat dan Bidan","Perawat dan Tenaga Administrasi","Perawat dan Sejawat"],k:3,
+  p:"Lima lingkup kode etik keperawatan Indonesia (PPNI): perawat dan klien, perawat dan praktik, perawat dan masyarakat, perawat dan teman sejawat, serta perawat dan profesi."},
+ {q:"Menjadi agen perubahan (change agent) tidak terlepas dari teori manajemen perubahan (change management) yang dikemukakan oleh Lewin, yang terdiri dari\u2026",
+  o:["Unrefresh, change, refresh","Unfreezing, change, refreezing","Unpredict, change, predict","Unbelieve, change, believe"],k:1,
+  p:"Teori perubahan Kurt Lewin terdiri dari tiga tahap: unfreezing (mencairkan kebiasaan lama), change/moving (melaksanakan perubahan), dan refreezing (memantapkan perilaku baru menjadi kebiasaan)."},
+ {q:"Manakah pernyataan di bawah ini yang BENAR terkait kepemimpinan, evidence-based nursing, change agent, dan perawat manajer kamar bedah?",
+  o:["Kepemimpinan adalah hal yang paling utama untuk menggerakkan suatu perubahan","Penerapan evidence-based nursing bersifat opsional","Gap/tensi antara yang baru dan yang lama memerlukan seorang change agent","Umpan balik hanya akan menambah masalah sehingga lebih baik diam"],k:2,
+  p:"Change agent berperan menjembatani kesenjangan (gap) antara kondisi lama dan kondisi baru agar perubahan berjalan. Evidence-based nursing bukan pilihan melainkan keharusan profesional, dan umpan balik justru dibutuhkan dalam proses perubahan."},
+ {q:"Dalam pedoman jenjang karir perawat, ada empat jalur karir yang dapat ditempuh oleh perawat. Kepala ruangan sebagai pengelola pelayanan keperawatan di kamar bedah termasuk kategori:",
+  o:["Perawat Klinis","Perawat Manajer","Perawat Pendidik","Perawat Peneliti"],k:1,
+  p:"Empat jalur jenjang karir perawat (Permenkes No. 40 Tahun 2017): Perawat Klinis (PK), Perawat Manajer (PM), Perawat Pendidik (PP), dan Perawat Peneliti (PR). Kepala ruangan yang mengelola pelayanan keperawatan termasuk jalur Perawat Manajer."},
+ {q:"Penerapan jenjang karir berbasis kompetensi memerlukan komitmen semua pihak sehingga dapat dilaksanakan di semua RS. Hal yang paling berpengaruh dalam pelaksanaan jenjang karir adalah:",
+  o:["Komitmen Pimpinan RS","Komitmen HRD","Komitmen Kabid Keperawatan","Komitmen Komite Keperawatan"],k:0,
+  p:"Komitmen pimpinan RS paling menentukan karena kebijakan, anggaran, dan dukungan struktural implementasi jenjang karir berada di tangan pimpinan; pihak lain berperan sebagai pelaksana teknis."},
+ {q:"Tujuan dari jenjang karir yang akan berpengaruh terhadap kepuasan dan kinerja perawat adalah:",
+  o:["Meningkatkan moral kerja","Mengurangi kebuntuan karir (dead end job/career)","Menurunkan jumlah perawat yang keluar dari pekerjaannya (turn over)","Menata sistem promosi berdasarkan persyaratan dan kriteria yang telah ditetapkan"],k:3,
+  p:"Sistem promosi yang tertata dengan persyaratan dan kriteria yang jelas memberi kepastian arah karir yang objektif, sehingga berdampak langsung pada kepuasan dan kinerja perawat."},
+ {q:"Semua pengorbanan yang dikeluarkan atau dipakai untuk menghasilkan suatu produk atau output, atau untuk mengonsumsi suatu produk atau output, yang dapat diukur dengan uang, merupakan definisi dari:",
+  o:["Satuan Biaya (Unit Cost)","Biaya (Cost)","Biaya Variabel (Variable Cost)","Biaya Tetap (Fixed Cost)"],k:1,
+  p:"Biaya (cost) adalah seluruh pengorbanan yang dapat diukur dengan uang untuk menghasilkan atau mengonsumsi suatu output. Unit cost adalah biaya yang dihitung per satu satuan produk."},
+ {q:"Rumus untuk menghitung unit cost adalah:",
+  o:["Total biaya tetap + total biaya variabel","Total biaya tetap dibagi total unit yang diproduksi","Total biaya tetap + total biaya variabel, dibagi total unit yang diproduksi","Total biaya variabel dibagi total unit yang diproduksi"],k:2,
+  p:"Unit cost = total biaya (biaya tetap + biaya variabel) \u00f7 jumlah unit yang diproduksi, sehingga diperoleh biaya per satu satuan produk/layanan."},
+ {q:"Manakah berikut yang BUKAN merupakan variabel dalam menghitung Biaya Investasi Tahunan (Annualized Investment Cost/AIC)?",
+  o:["Harga beli alat/investasi","Laju inflasi","Masa pakai alat/investasi saat perhitungan","Biaya pemeliharaan alat/investasi"],k:3,
+  p:"Komponen perhitungan AIC adalah harga beli (nilai investasi), laju inflasi, masa pakai, dan umur ekonomis alat. Biaya pemeliharaan termasuk biaya operasional/pemeliharaan, bukan komponen AIC."},
+ {q:"Dalam program kerja, siapa yang paling tepat untuk menentukan tugas yang akan dikerjakan oleh masing-masing anggota tim?",
+  o:["Manajer Keperawatan","Penanggung Jawab Kamar Bedah / Kepala Ruangan Kamar Bedah","Pihak eksternal yang tidak terlibat","Tim pemasaran"],k:0,
+  p:"Manajer keperawatan memiliki kewenangan manajerial untuk menetapkan pembagian tugas anggota tim dalam program kerja sesuai kompetensi dan beban kerja masing-masing."},
+ {q:"Apa langkah pertama yang harus dilakukan dalam membuat program kerja untuk sebuah proyek?",
+  o:["Menghitung anggaran","Mengidentifikasi tujuan dan sasaran","Membagi tugas kepada anggota tim","Menyusun daftar risiko"],k:1,
+  p:"Perencanaan selalu diawali dengan menetapkan tujuan dan sasaran. Anggaran, pembagian tugas, dan analisis risiko baru dapat disusun setelah tujuan program jelas."},
+ {q:"Apa yang dimaksud dengan \"timeline\" dalam program kerja?",
+  o:["Rencana anggaran dan biaya","Daftar tugas yang harus diselesaikan dalam program","Urutan waktu yang menunjukkan tahapan-tahapan kegiatan","Dokumentasi risiko yang ada dalam program"],k:2,
+  p:"Timeline adalah kerangka waktu yang menggambarkan urutan tahapan kegiatan program dari awal hingga akhir, sebagai acuan pemantauan progres."},
+ {q:"Tujuan pengelolaan ketenagaan di kamar bedah adalah:",
+  o:["Mengontrol apakah segala kegiatan sesuai rencana","Menjamin keberlangsungan dan kesinambungan pelayanan pembedahan dan keperawatan yang berkualitas kepada pasien","Memperlakukan staf sebagai tenaga profesional dan partner kerja","Menghargai segala ide, pendapat, dan pengalaman dalam usaha memperbaiki asuhan keperawatan"],k:1,
+  p:"Inti pengelolaan ketenagaan kamar bedah adalah memastikan jumlah dan kompetensi tenaga memadai sehingga pelayanan pembedahan dan keperawatan berjalan berkualitas, aman, dan berkesinambungan."},
+ {q:"Untuk menghitung kebutuhan tenaga di kamar bedah, faktor pasien yang harus dipertimbangkan yaitu:",
+  o:["Tipe surgeon (operator) dengan variasi kompetensinya","Tipe pasien dengan berbagai permasalahannya","Tipe pasien, jenis operasi, kompleksitas, dan lamanya operasi","Jumlah dan komposisi tenaga yang ada"],k:2,
+  p:"Faktor pasien dalam perhitungan kebutuhan tenaga kamar bedah meliputi tipe/jumlah pasien, jenis operasi, tingkat kompleksitas, dan durasi operasi. Faktor operator dan faktor tenaga dihitung terpisah."},
+ {q:"Faktor tenaga yang perlu diperhatikan karena memengaruhi kebutuhan tenaga antara lain:",
+  o:["Fasilitas, jenis layanan yang diberikan, dan kelengkapan peralatan medik","Jumlah dan komposisi tenaga yang ada serta tingkat pendidikan dan pengalaman","Kebijakan pengaturan dinas karyawan","Tipe surgeon (operator) dengan variasi kompetensinya"],k:1,
+  p:"Faktor tenaga mencakup jumlah dan komposisi tenaga yang tersedia serta kualifikasi pendidikan dan pengalamannya. Fasilitas dan kebijakan pengaturan dinas termasuk faktor organisasi/lingkungan kerja."},
+ {q:"Menilai dan memperbaiki faktor-faktor yang memengaruhi proses pemberian pelayanan asuhan keperawatan merupakan bagian dari:",
+  o:["Tujuan Supervisi","Fungsi Supervisi","Manfaat Supervisi","Metode Supervisi"],k:1,
+  p:"Fungsi supervisi keperawatan adalah menilai dan memperbaiki faktor-faktor yang memengaruhi proses pemberian asuhan, sedangkan tujuan supervisi mengarah pada hasil akhir berupa pelayanan yang bermutu."},
+ {q:"Prinsip dari supervisi adalah:",
+  o:["Fair, Feedback, Follow Up","Fair, Follow Up, Finish","Feedback, Follow Up, Finish","Smart, Real Time, Follow Up"],k:0,
+  p:"Prinsip supervisi dikenal dengan 3F: fair (objektif dan adil), feedback (memberikan umpan balik konstruktif), dan follow up (menindaklanjuti hasil supervisi)."},
+ {q:"Supervisi yang dilakukan melalui laporan, baik tertulis maupun lisan, merupakan cara pelaksanaan supervisi:",
+  o:["Langsung","Tidak langsung","Evaluasi","Feedback"],k:1,
+  p:"Supervisi tidak langsung dilakukan melalui laporan lisan/tertulis atau dokumentasi, tanpa mengamati kegiatan secara langsung. Supervisi langsung dilakukan dengan mengamati kegiatan saat berlangsung."},
+ {q:"Karakteristik Healthcare Associated Infections (HAIs) adalah:",
+  o:["Bersifat lokal","Bersifat sistemik","Didapat di rumah sakit","Pada saat masuk rumah sakit tidak ada infeksi"],k:2,
+  p:"HAIs adalah infeksi yang didapat pasien selama dirawat di fasilitas pelayanan kesehatan (umumnya muncul \u226548 jam setelah masuk), yang saat masuk tidak sedang dalam masa infeksi maupun inkubasi."},
+ {q:"Yang BUKAN merupakan tindakan pencegahan infeksi daerah operasi (IDO) adalah:",
+  o:["Pendidikan dan latihan kepada petugas serta kegiatan surveilans","Observasi langsung kepatuhan teknik aseptik","Mengembangkan kebijakan kepatuhan penggunaan APD yang benar","Mengkaji status imunologi pasien"],k:3,
+  p:"Diklat petugas, surveilans, observasi kepatuhan teknik aseptik, dan kebijakan APD merupakan strategi pencegahan IDO. Pengkajian status imunologi termasuk asesmen faktor risiko pasien, bukan tindakan pencegahan langsung."},
+ {q:"Seorang perawat mulai melihat masalah dari berbagai sudut pandang dan mulai mempertimbangkan risiko dan manfaat dari setiap keputusan. Ini merupakan tingkat berpikir kritis:",
+  o:["Dasar","Kompleks","Komitmen","Kreatif"],k:2,
+  p:"Pada tingkat komitmen, perawat menganalisis alternatif dari berbagai sudut pandang, menimbang risiko dan manfaat setiap keputusan, kemudian memilih tindakan dan bertanggung jawab atas pilihannya."},
+ {q:"\"Bagaimana suatu hasil ini akan terpengaruh jika difusi diabaikan?\" Kalimat ini merupakan pertanyaan tentang:",
+  o:["Sudut pandang dan perspektif","Menyelidiki alasan dan bukti","Klarifikasi","Menyelidiki implikasi dan konsekuensi"],k:1,
+  p:"Pertanyaan tersebut menggali alasan dan bukti yang mendasari suatu hasil (atas dasar apa hasil dapat berubah), salah satu teknik bertanya Socratik dalam melatih berpikir kritis."},
+ {q:"Penilaian kinerja adalah proses mengevaluasi seberapa baik karyawan melakukan suatu pekerjaan dibandingkan dengan standar yang telah ditentukan. Salah satu tujuan penilaian kinerja adalah:",
+  o:["Mengetahui kekurangan karyawan","Memberikan imbalan yang layak, seperti kenaikan gaji pokok dan insentif","Menurunkan tanggung jawab karyawan","Menilai motivasi kerja"],k:1,
+  p:"Salah satu tujuan penilaian kinerja adalah menjadi dasar pemberian reward yang adil dan layak (kenaikan gaji, insentif, promosi), di samping untuk pengembangan kompetensi karyawan."},
+ {q:"Dalam penilaian kinerja, salah satu komponen kunci yang menggambarkan aspek hasil kerja karyawan disusun melalui penyusunan:",
+  o:["Aspek Key Performance Indicator (KPI)","Aspek Kompetensi","Aspek Kinerja","Aspek Attitude"],k:0,
+  p:"KPI (Key Performance Indicator) adalah indikator terukur yang menggambarkan capaian hasil kerja karyawan terhadap target yang ditetapkan, sehingga menjadi komponen kunci aspek hasil kerja."},
+ {q:"Faktor yang memengaruhi kinerja karyawan adalah kemampuan potensi (IQ) dan kemampuan reality (knowledge and skill). Karyawan perlu ditempatkan pada pekerjaan yang sesuai dengan keahliannya. Ini merupakan faktor\u2026",
+  o:["Kemampuan (Ability)","Motivasi","Individu","Lingkungan"],k:0,
+  p:"Kinerja dipengaruhi faktor kemampuan (ability = potensi IQ + knowledge & skill) dan motivasi. Penempatan karyawan sesuai keahlian (the right man in the right place) merupakan wujud faktor kemampuan."},
+ {q:"Perawat Yesy melakukan scrub di OK A pada kasus Coronary Artery Bypass Graft (CABG). Operasi dijadwalkan mulai pukul 07.30, tetapi baru dimulai pukul 08.30 dan selesai pukul 11.30, dan selanjutnya tidak ada lagi kasus operasi yang dikerjakan. Jam kerja shift adalah pukul 07.30\u201314.30. Sisa waktu 3 jam perawat Yesy yang tidak dimanfaatkan hingga jam kerja selesai disebut:",
+  o:["Start time tardiness","Overutilized time","Underutilized time","Turnover time"],k:2,
+  p:"Underutilized time adalah waktu kerja staf/kamar operasi yang tersedia tetapi tidak terpakai untuk kegiatan produktif \u2014 dalam kasus ini 3 jam sisa jam kerja tanpa kegiatan operasi."},
+ {q:"Terkait kasus di atas: operasi dijadwalkan mulai pukul 07.30 tetapi baru dimulai pukul 08.30. Keterlambatan 1 jam dimulainya operasi disebut:",
+  o:["Start time tardiness","Overutilized time","Underutilized time","Turnover time"],k:0,
+  p:"Start time tardiness adalah keterlambatan dimulainya operasi dari jadwal yang ditetapkan (first case on-time start), di sini terlambat 1 jam dari jadwal."},
+ {q:"Setiap anggota tim operasi memperkenalkan diri dan peran masing-masing sebelum melakukan insisi pertama pada kulit. Ini termasuk pada fase\u2026",
+  o:["Fase time out","Fase sign out","Fase sign in","Fase anestesi"],k:0,
+  p:"Time out dilakukan sesaat sebelum insisi kulit: seluruh tim memperkenalkan diri dan perannya, serta mengonfirmasi identitas pasien, prosedur, dan sisi operasi (WHO Surgical Safety Checklist)."},
+ {q:"Fase sebelum induksi anestesi ketika koordinator secara verbal memeriksa apakah identitas pasien telah dikonfirmasi, prosedur dan sisi operasi sudah benar, sisi yang akan dioperasi telah ditandai, persetujuan operasi telah diberikan, dan pulse oximeter pada pasien berfungsi, adalah\u2026",
+  o:["Fase sign in","Fase sign out","Fase time out","Fase preoperasi"],k:0,
+  p:"Sign in dilakukan sebelum induksi anestesi: verifikasi identitas pasien, prosedur, penandaan sisi operasi, informed consent, serta fungsi pulse oximeter (WHO Surgical Safety Checklist)."}
+];
+
+/* ================= STATE ================= */
+let state = null;
+let tick = null;
+let actx = null;
+
+function newState(){
+  return {
+    nama:"", instansi:"",
+    cur:0,
+    answers:Array(QUESTIONS.length).fill(null),
+    remaining:TOTAL_SECONDS,
+    finished:false,
+    alarmed:false,
+    tanggal:""
+  };
+}
+
+/* ================= KUNCI 1x UJIAN ================= */
+function getLock(){
+  try{ return JSON.parse(localStorage.getItem(LOCK_KEY) || "null"); }
+  catch(e){ return null; }
+}
+function saveLock(rec){
+  try{ localStorage.setItem(LOCK_KEY, JSON.stringify(rec)); }catch(e){}
+}
+function clearLock(){
+  try{ localStorage.removeItem(LOCK_KEY); }catch(e){}
+}
+function showLocked(){
+  const L = getLock();
+  const info = document.getElementById('lock-info');
+  if(L){
+    info.innerHTML = 'Atas nama <b>'+esc(L.nama)+'</b> ('+esc(L.instansi)+')<br>'+
+      esc(L.tanggal)+' &bull; Skor: <b>'+esc(String(L.skor))+'</b> / 100';
+  } else {
+    info.textContent = '';
+  }
+  goTo('locked');
+}
+function unlock(){
+  const inp = document.getElementById('in-kode');
+  const f = document.getElementById('f-kode');
+  if(inp.value === ADMIN_CODE){
+    clearLock();
+    f.classList.remove('invalid');
+    inp.value = '';
+    alert('Kunci dibuka. Peserta diizinkan mengikuti ujian 1 kali lagi.');
+    goTo('home');
+  } else {
+    f.classList.add('invalid');
+  }
+}
+function tryStart(){
+  if(getLock()){ showLocked(); return; }
+  goTo('data');
+}
+
+/* ================= NAVIGASI LAYAR ================= */
+function goTo(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0});
+}
+
+/* ================= NADA ALARM ================= */
+function initAudio(){
+  try{
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if(AC && !actx) actx = new AC();
+    if(actx && actx.state === 'suspended') actx.resume();
+  }catch(e){}
+}
+function beep(freq, dur, delay){
+  if(!actx) return;
+  try{
+    const t = actx.currentTime + (delay||0);
+    const o = actx.createOscillator();
+    const g = actx.createGain();
+    o.type = 'sine'; o.frequency.value = freq;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.35, t+0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t+dur);
+    o.connect(g); g.connect(actx.destination);
+    o.start(t); o.stop(t+dur+0.05);
+  }catch(e){}
+}
+function alarm5Menit(){          // alarm panjang saat sisa 5 menit
+  for(let i=0;i<3;i++){ beep(880,0.28,i*0.45); beep(660,0.28,i*0.45+0.15); }
+}
+function beepMenit(){ beep(880,0.22,0); }                 // penanda tiap menit terakhir
+function beepDetik(){ beep(1100,0.09,0); }                // hitung mundur 10 detik akhir
+
+/* ================= MULAI ================= */
+function startExam(){
+  if(getLock()){ showLocked(); return; }
+  const nama = document.getElementById('in-nama').value.trim();
+  const instansi = document.getElementById('in-instansi').value.trim();
+  document.getElementById('f-nama').classList.toggle('invalid', !nama);
+  document.getElementById('f-instansi').classList.toggle('invalid', !instansi);
+  if(!nama || !instansi) return;
+  initAudio();
+  state = newState();
+  state.nama = nama; state.instansi = instansi;
+  buildDots();
+  goTo('exam');
+  renderQuestion();
+  startTick();
+}
+
+/* ================= TIMER GLOBAL 30 MENIT ================= */
+function startTick(){
+  stopTick();
+  tick = setInterval(()=>{
+    if(!state || state.finished) return stopTick();
+    state.remaining--;
+    const r = state.remaining;
+    updateTimerUI();
+    if(r === ALARM_AT && !state.alarmed){ state.alarmed = true; alarm5Menit(); }
+    else if(r < ALARM_AT && r > 10 && r % 60 === 0){ beepMenit(); }
+    else if(r <= 10 && r > 0){ beepDetik(); }
+    if(r <= 0){ finishExam(true); }   // submit otomatis: selesai tidak selesai
+  },1000);
+}
+function stopTick(){ if(tick){clearInterval(tick); tick=null;} }
+
+function fmt(sec){
+  sec = Math.max(0,sec);
+  const m = String(Math.floor(sec/60)).padStart(2,'0');
+  const s = String(sec%60).padStart(2,'0');
+  return m+':'+s;
+}
+function updateTimerUI(){
+  document.getElementById('m-timer').textContent = fmt(state.remaining);
+  document.getElementById('v-timer').classList.toggle('warn', state.remaining <= ALARM_AT);
+}
+
+/* ================= RENDER SOAL ================= */
+function buildDots(){
+  const box = document.getElementById('dots');
+  box.innerHTML = '';
+  QUESTIONS.forEach((_,i)=>{
+    const b = document.createElement('button');
+    b.className = 'dot-q';
+    b.type = 'button';
+    b.textContent = i+1;
+    b.setAttribute('aria-label','Soal '+(i+1));
+    b.onclick = ()=>{ state.cur = i; renderQuestion(); };
+    box.appendChild(b);
+  });
+}
+
+function renderQuestion(){
+  const i = state.cur;
+  const Q = QUESTIONS[i];
+
+  document.getElementById('m-who').innerHTML =
+    '&#128100; <b>'+esc(state.nama)+'</b> &bull; '+esc(state.instansi);
+  document.getElementById('m-q').textContent =
+    String(i+1).padStart(2,'0')+'/'+QUESTIONS.length;
+  document.getElementById('q-num').textContent =
+    'SOAL '+String(i+1).padStart(2,'0')+' / '+QUESTIONS.length;
+  document.getElementById('q-text').textContent = Q.q;
+  updateTimerUI();
+
+  const answered = state.answers.filter(a=>a!==null).length;
+  document.getElementById('pbar').style.width = (answered/QUESTIONS.length*100)+'%';
+
+  const box = document.getElementById('opts');
+  box.innerHTML = '';
+  Q.o.forEach((opt,j)=>{
+    const b = document.createElement('button');
+    b.className = 'opt'+(state.answers[i]===j?' selected':'');
+    b.type = 'button';
+    b.innerHTML = '<span class="letter">'+LETTERS[j]+'</span><span>'+esc(opt)+'</span>';
+    b.onclick = ()=>{
+      state.answers[i] = (state.answers[i]===j) ? null : j;
+      renderQuestion();
+    };
+    box.appendChild(b);
+  });
+
+  document.getElementById('btn-prev').disabled = (i===0);
+  document.getElementById('btn-next').disabled = (i===QUESTIONS.length-1);
+
+  document.querySelectorAll('.dot-q').forEach((d,j)=>{
+    d.classList.toggle('current', j===i);
+    d.classList.toggle('answered', state.answers[j]!==null);
+  });
+}
+
+function nav(dir){
+  const n = state.cur + dir;
+  if(n<0 || n>=QUESTIONS.length) return;
+  state.cur = n;
+  renderQuestion();
+}
+
+/* ================= SELESAI & HASIL ================= */
+function confirmFinish(){
+  const kosong = state.answers.filter(a=>a===null).length;
+  let msg = 'Setelah dikirim, jawaban TIDAK dapat diubah dan ujian TIDAK dapat diulang. Kirim jawaban sekarang?';
+  if(kosong>0) msg = 'Masih ada '+kosong+' soal yang belum dijawab. '+msg;
+  if(!window.confirm(msg)) return;
+  finishExam(false);
+}
+
+function finishExam(auto){
+  if(!state || state.finished) return;
+  state.finished = true;
+  stopTick();
+  state.tanggal = new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'})
+    + ', ' + new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+
+  let benar=0, salah=0, kosong=0;
+  state.answers.forEach((a,i)=>{
+    if(a===null) kosong++;
+    else if(a===QUESTIONS[i].k) benar++;
+    else salah++;
+  });
+  const skor = Math.round(benar/QUESTIONS.length*1000)/10;
+  const skorTxt = (skor%1===0)?skor.toFixed(0):skor.toFixed(1);
+
+  // kunci: 1 peserta = 1 kali ujian
+  saveLock({nama:state.nama, instansi:state.instansi, tanggal:state.tanggal, skor:skorTxt});
+
+  // kirim hasil ke Google Spreadsheet panitia
+  sendToSheet({
+    nama: state.nama,
+    instansi: state.instansi,
+    waktu_ujian: state.tanggal,
+    skor: skorTxt,
+    benar: benar,
+    salah: salah,
+    kosong: kosong,
+    durasi_terpakai: fmt(TOTAL_SECONDS - Math.max(0,state.remaining)),
+    jenis_submit: auto ? 'Otomatis (waktu habis)' : 'Manual',
+    jawaban: state.answers.map(a => a===null ? '-' : LETTERS[a]).join(',')
+  });
+
+  document.getElementById('r-score').textContent = skorTxt;
+  document.getElementById('r-benar').textContent = benar;
+  document.getElementById('r-salah').textContent = salah;
+  document.getElementById('r-kosong').textContent = kosong;
+  document.getElementById('r-who').innerHTML =
+    esc(state.nama)+' &bull; '+esc(state.instansi)+'<br>'+esc(state.tanggal)+
+    (auto?'<br><span style="color:var(--amber);font-weight:600">&#9203; Waktu habis \u2014 jawaban dikirim otomatis.</span>':'');
+
+  renderReview();
+  goTo('result');
+  if(auto) alert('Waktu 30 menit telah habis. Jawaban Anda dikirim otomatis.');
+}
+
+function renderReview(){
+  const box = document.getElementById('review');
+  box.innerHTML = '';
+  QUESTIONS.forEach((Q,i)=>{
+    const a = state.answers[i];
+    const status = (a===null)?'skip':(a===Q.k?'ok':'bad');
+    const tag = {ok:'&#10004; BENAR', bad:'&#10008; SALAH', skip:'&#8722; TIDAK DIJAWAB'}[status];
+    const div = document.createElement('div');
+    div.className = 'card rev '+status;
+    div.innerHTML =
+      '<span class="tag">'+tag+'</span>'+
+      '<div class="q-num">SOAL '+String(i+1).padStart(2,'0')+'</div>'+
+      '<div class="q-text">'+esc(Q.q)+'</div>'+
+      '<div class="ansline">Jawaban Anda: <b>'+(a===null?'&#8212;':LETTERS[a]+'. '+esc(Q.o[a]))+'</b></div>'+
+      '<div class="ansline">Kunci jawaban: <b>'+LETTERS[Q.k]+'. '+esc(Q.o[Q.k])+'</b></div>'+
+      '<div class="pemb"><b>Pembahasan:</b> '+esc(Q.p)+'</div>';
+    box.appendChild(div);
+  });
+}
+
+/* ================= PDF ================= */
+function savePDF(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:'mm',format:'a4'});
+  const W = doc.internal.pageSize.getWidth();
+  const M = 15;
+  let y = 0;
+
+  let benar=0,salah=0,kosong=0;
+  state.answers.forEach((a,i)=>{
+    if(a===null)kosong++; else if(a===QUESTIONS[i].k)benar++; else salah++;
+  });
+  const skor = Math.round(benar/QUESTIONS.length*1000)/10;
+
+  doc.setFillColor(10,79,74);
+  doc.rect(0,0,W,30,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFont('helvetica','bold'); doc.setFontSize(13);
+  doc.text('HASIL UJIAN TULIS PELATIHAN MANAJEMEN KAMAR BEDAH',W/2,13,{align:'center'});
+  doc.setFont('helvetica','normal'); doc.setFontSize(9.5);
+  doc.text('HIPKABI DKI Jakarta',W/2,20,{align:'center'});
+  y = 40;
+
+  doc.setTextColor(20,20,20); doc.setFontSize(11);
+  const line = (label,val)=>{
+    doc.setFont('helvetica','bold'); doc.text(label,M,y);
+    doc.setFont('helvetica','normal'); doc.text(': '+val,M+35,y);
+    y += 7;
+  };
+  line('Nama', state.nama);
+  line('Asal Instansi', state.instansi);
+  line('Waktu Ujian', state.tanggal);
+  y += 3;
+
+  doc.setFont('helvetica','bold'); doc.setFontSize(13);
+  doc.text('SKOR: '+((skor%1===0)?skor.toFixed(0):skor.toFixed(1))+' / 100',M,y); y+=7;
+  doc.setFont('helvetica','normal'); doc.setFontSize(11);
+  doc.text('Benar: '+benar+'    Salah: '+salah+'    Tidak dijawab: '+kosong,M,y); y+=10;
+
+  doc.setFont('helvetica','bold'); doc.setFontSize(11);
+  doc.text('Rincian Jawaban',M,y); y+=6;
+  doc.setFontSize(9);
+  doc.setFont('helvetica','bold');
+  doc.text('No',M,y); doc.text('Jawaban',M+12,y); doc.text('Kunci',M+34,y); doc.text('Status',M+52,y);
+  doc.text('No',M+95,y); doc.text('Jawaban',M+107,y); doc.text('Kunci',M+129,y); doc.text('Status',M+147,y);
+  y+=5;
+  doc.setFont('helvetica','normal');
+  const half = Math.ceil(QUESTIONS.length/2);
+  const rowY = y;
+  for(let i=0;i<QUESTIONS.length;i++){
+    const col = i<half ? 0 : 95;
+    const yy  = rowY + (i%half)*5.4;
+    const a = state.answers[i];
+    const st = (a===null)?'Kosong':(a===QUESTIONS[i].k?'Benar':'Salah');
+    doc.text(String(i+1),M+col,yy);
+    doc.text(a===null?'-':LETTERS[a],M+12+col,yy);
+    doc.text(LETTERS[QUESTIONS[i].k],M+34+col,yy);
+    doc.text(st,M+52+col,yy);
+  }
+  y = rowY + half*5.4 + 8;
+
+  doc.setFontSize(8); doc.setTextColor(110,110,110);
+  doc.text('Dokumen ini dibuat otomatis oleh aplikasi Ujian Tulis Pelatihan Manajemen Kamar Bedah - HIPKABI DKI Jakarta.',M,y);
+
+  const safe = state.nama.replace(/[^a-z0-9]+/gi,'_');
+  doc.save('Hasil_Ujian_ManajemenKamarBedah_'+safe+'.pdf');
+}
+
+/* ================= KIRIM KE SPREADSHEET ================= */
+function sendToSheet(data){
+  if(!SHEET_WEBAPP_URL){
+    setSendStatus('');   // fitur tidak aktif: tidak menampilkan apa-apa
+    return;
+  }
+  setSendStatus('&#8987; Mengirim hasil ke panitia\u2026');
+  const body = new URLSearchParams(data).toString();
+  const done = ()=> setSendStatus('&#9989; Hasil sudah terkirim ke panitia.');
+  const fail = ()=>{
+    // cadangan: sendBeacon (tetap terkirim walau halaman ditutup)
+    try{
+      const blob = new Blob([body],{type:'application/x-www-form-urlencoded'});
+      if(navigator.sendBeacon && navigator.sendBeacon(SHEET_WEBAPP_URL, blob)){ done(); return; }
+    }catch(e){}
+    setSendStatus('&#9888;&#65039; Hasil gagal terkirim (periksa koneksi). Simpan PDF dan kirimkan ke panitia.');
+  };
+  try{
+    fetch(SHEET_WEBAPP_URL,{
+      method:'POST',
+      mode:'no-cors',           // Apps Script tidak mengirim header CORS; respons tidak bisa dibaca
+      headers:{'Content-Type':'application/x-www-form-urlencoded'},
+      body: body
+    }).then(done).catch(fail);
+  }catch(e){ fail(); }
+}
+function setSendStatus(html){
+  const el = document.getElementById('send-status');
+  if(el){ el.innerHTML = html; el.style.display = html ? 'block' : 'none'; }
+}
+
+/* ================= UTIL ================= */
+function esc(s){
+  return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* Peringatan bila menutup halaman saat ujian berjalan */
+window.addEventListener('beforeunload', e=>{
+  if(state && !state.finished){ e.preventDefault(); e.returnValue = ''; }
+});
+
+/* Cek kunci saat halaman dibuka */
+document.addEventListener('DOMContentLoaded', ()=>{
+  if(getLock()) showLocked();
+});
+</script>
+</body>
+</html>
